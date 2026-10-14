@@ -17,3 +17,5 @@ data/*.sql
 snap/
 .gitconfig
 venv/
+
+!backup/suicidios_completo.sql

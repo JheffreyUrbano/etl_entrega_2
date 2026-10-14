@@ -5,11 +5,16 @@ x-airflow-common:
   build: .
   env_file: .env
   environment:
-    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres_entrega2/airflow
-    - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    - AIRFLOW__CORE__DEFAULT_TIMEZONE=America/Bogota
-    - PYTHONPATH=/opt/airflow
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_entrega2/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: America/Bogota
+    AIRFLOW__CORE__PARALLELISM: 2
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: 2
+    AIRFLOW__WEBSERVER__WORKERS: 2
+    AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: 300
+    AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: 300
+    PYTHONPATH: /opt/airflow
   volumes:
     - ./dags:/opt/airflow/dags
     - ./scripts:/opt/airflow/scripts
@@ -18,17 +23,14 @@ x-airflow-common:
     - ./data:/opt/airflow/data
   extra_hosts:
     - "host.docker.internal:host-gateway"
-  depends_on:
-    postgres_entrega2:
-      condition: service_healthy
 
 services:
   postgres_entrega2:
     image: postgres:16-alpine
     environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
     ports:
       - "5436:5432"
     healthcheck:
@@ -49,7 +51,6 @@ services:
         chown -R 50000:0 /opt/airflow/logs /opt/airflow/data
         airflow db migrate
         airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com || true
-        echo "AIRFLOW INICIALIZADO CORRECTAMENTE"
 
   airflow-webserver:
     <<: *airflow-common

@@ -86,7 +86,7 @@ etl_entrega_ii/
 │   ├── validate_ge.py            # Contrato de datos y enrutamiento a cuarentena
 │   └── load_dw.py                # Carga al esquema public de PostgreSQL
 └── notebooks/
-    └── 03_etl_eda_v2.ipynb       # Análisis exploratorio (Data Profiling) de fuentes
+    └── etl_eda_v3.ipynb          # Análisis de datos y visualizaciones
 ```
 
 Nota: Asegúrese de consultar la tabla fact_suicidios_enriquecida_v2 para la construcción de reportes, ya que esta contiene exclusivamente los registros que superaron el contrato de datos.

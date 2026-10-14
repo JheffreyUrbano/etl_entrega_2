@@ -108,3 +108,36 @@ DW_PASSWORD=airflow
 DW_DB=suicidios_colombia
 GCS_BUCKET_NAME=ws2-etl-bucket
 DANE_CSV_FILENAME=proyecciones_dane.csv
+EOF
+```
+
+#### Paso 1: Clonar el repositorio y configurar variables de entorno
+Para que el script de Airflow pueda acceder a los archivos alojados en el bucket de GCS (ws2-etl-bucket), el entorno local debe autenticarse:
+
+```bash
+gcloud auth application-default login
+```
+(Debe iniciar sesión con una cuenta de Google que tenga permisos de lectura en el proyecto de GCP correspondiente).
+
+#### Paso 3: Inicializar y levantar los contenedores Docker
+Ejecute la inicialización de la base de datos interna de Airflow y levante el stack:
+```bash
+docker-compose up airflow-init
+docker-compose up -d --build
+```
+
+#### Paso 4: Restaurar la base de datos original
+El contenedor de PostgreSQL nace vacío. Para que el pipeline tenga los datos de origen, debes restaurar el archivo de respaldo `suicidios_completo.sql` (ubicado en la carpeta `backup/` de este repositorio) directamente hacia el contenedor local:
+
+
+- 4.1. Crear la base de datos en el contenedor
+```bash
+docker exec -it postgres_entrega2 psql -U airflow -c "CREATE DATABASE suicidios_colombia;"
+```
+
+- 4.2. Restaurar los datos desde el archivo SQL local
+```bash
+docker exec -i postgres_entrega2 psql -U airflow -d suicidios_colombia < backup/suicidios_completo.sql
+```
+
+Una vez completados estos pasos, puede acceder a la interfaz de Apache Airflow abriendo http://localhost:8083 en su navegador web (Usuario: admin, Contraseña: admin) y ejecutar el DAG etl_suicidios_valle_v2.

@@ -44,6 +44,8 @@ El entorno de producción está desplegado en una máquina virtual de **Google C
 
 El flujo de trabajo se ejecuta diariamente (`@daily`) mediante tareas programadas en Airflow:
 
+![airflow.png](assets/airflow.png)
+
 1. **Extract (Extracción Paralela):** Tareas independientes consumen las APIs, scrapean la web, descargan archivos del bucket GCS y consultan el Data Warehouse relacional, almacenando los resultados intermedios en una capa *Staging* local (`/opt/airflow/data`).
 2. **Transform & Merge:** Pandas se encarga de limpiar nulos, aplicar *Entity Resolution* (normalización de textos y cruces por códigos DANE o nombres de municipios), eliminar columnas redundantes (superposición de sufijos `_x`, `_y`) y fusionar las 5 fuentes en un único dataset maestro.
 3. **Validate (Data Quality):** Intervención de *Great Expectations* para auditar el dataset maestro contra un contrato de datos estricto.
